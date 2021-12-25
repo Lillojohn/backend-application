@@ -12,6 +12,11 @@ use DOMXPath;
 class HtmlToRosterEventParserService
 {
 
+    /**
+     * @param string $fileName
+     * @return bool|null
+     * @throws \Exception
+     */
     public function parseHtmlToRosterEvent(string $fileName): ?bool
     {
         if (!file_exists($fileName) || !is_readable($fileName)) {
@@ -23,6 +28,13 @@ class HtmlToRosterEventParserService
         return true;
     }
 
+    /**
+     * Read the html file and make in into an array. Each row contains the content to make a RosterEvent.
+     *
+     * @param string $htmlFile
+     * @return array
+     * @throws \Exception
+     */
     private function htmlTableInColumnArray(string $htmlFile): array
     {
         libxml_use_internal_errors(true);
@@ -98,25 +110,39 @@ class HtmlToRosterEventParserService
         });
     }
 
+    /**
+     * Get the constants of RosterEventHeaders to get the correct headers.
+     *
+     * @param $value
+     * @return bool
+     */
     private function findCorrectColumn($value): bool
     {
         $reflectionClass = new \ReflectionClass(RosterEventHeaders::class);
         return in_array($value, $reflectionClass->getConstants());
     }
 
+    /**
+     * @param string $date
+     * @return DateTime|null
+     * @throws \Exception
+     */
     private function dayToDateTime(string $date): ?DateTime
     {
         // Remove everything in string expect the numbers
         $day = preg_replace('/[^0-9]/', '', $date);
 
         // Check if there are only 2 numbers
-        if(!preg_match('/^[0-9]{1,2}$/', $day)){
+        if(!preg_match('/^[0-3][0-9]$/', $day)){
             return null;
         }
 
         return new DateTime("2022-01-" . $day);
     }
 
+    /**
+     * @param array $rosterEventsArray
+     */
     private function saveArrayToRosterEvent(array $rosterEventsArray)
     {
         $rosterEvents = [];
@@ -136,6 +162,12 @@ class HtmlToRosterEventParserService
         });
     }
 
+    /**
+     * Get an array of extra activities
+     *
+     * @param array $event
+     * @return array|string[]
+     */
     private function extractActivities(array $event): array
     {
         $extractActivities = [];
@@ -166,11 +198,25 @@ class HtmlToRosterEventParserService
         return ["UNK"];
     }
 
+    /**
+     * Regex to see if the activity is a flight
+     * Criteria: DX + at least 2 numbers
+     *
+     * @param string $event
+     * @return false|int
+     */
     private function checkFlightActivity(string $event)
     {
         return preg_match('/^DX[0-9]{2,}$/', $event);
     }
 
+    /**
+     * Check if the time is correct
+     * Criteria: Needs to be 4 numbers.
+     *
+     * @param string $event
+     * @return false|int
+     */
     private function checkTime(string $event)
     {
         return preg_match('/^[0-9]{4}$/', $event);

@@ -24,7 +24,7 @@ class HtmlToRosterEventParserCommand extends Command
     /**
      * @var HtmlToRosterEventParserService
      */
-    private $htmlToRosterEventParserService;
+    private HtmlToRosterEventParserService $htmlToRosterEventParserService;
 
     /**
      * Create a new command instance.
@@ -41,13 +41,17 @@ class HtmlToRosterEventParserCommand extends Command
      * Execute the console command.
      *
      * @return int
+     * @throws \Exception
      */
-    public function handle()
+    public function handle(): int
     {
         $roster = $this->htmlToRosterEventParserService->parseHtmlToRosterEvent($this->argument('fileName'));
+
         if ($roster === null){
-            echo "file not found";
+            $this->error("file not found");
+            return 1;
         }
+        $this->info("Added new roster events");
         return 0;
     }
 }

@@ -74,12 +74,7 @@ class RosterEventsService
         return $this->addExtraActivities($rosterEvents);
     }
 
-    public function generateRosterByHtmlFile(string $location){
-
-    }
-
     /**
-     *
      * Check if date is in format yyyy-mm-dd
      *
      * @param string $date
@@ -91,7 +86,6 @@ class RosterEventsService
     }
 
     /**
-     *
      * Add the extra activities to the roster event.
      *
      * @param Collection $rosterEvents
@@ -99,7 +93,7 @@ class RosterEventsService
      */
     private function addExtraActivities(Collection $rosterEvents): Collection
     {
-        return $rosterEvents->map(function($item, $key){
+        return $rosterEvents->map(function($item){
             return RosterEvent::with('extraActivities')->find($item->id);
         });
     }
