@@ -26,11 +26,6 @@ Route::get(
 );
 
 Route::get(
-    '/flight/next-week/{startDate?}',
-    [RosterEventsController::class, 'getFlightNextWeek']
-);
-
-Route::get(
     '/stand-by/next-week/{startDate?}',
     [RosterEventsController::class, 'getStandbyEventsForNextWeek']
 );
